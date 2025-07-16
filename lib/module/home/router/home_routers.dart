@@ -15,7 +15,7 @@ class HomeModuleRoute extends BaseModuleRoute {
 
   @override
   Map<String, WidgetBuilder> get routes => {
-    entryPath: (_) => const HomePage(),
+    entryPath: (_) => const ProductPage(),
     activityPath: (context) {
       final settings = ModalRoute.of(context)?.settings;
       final args = settings?.arguments;

@@ -17,7 +17,7 @@ class ProfileModuleRoute extends BaseModuleRoute {
   @override
   Map<String, WidgetBuilder> get routes => {
     entryPath: (_) => const ProfilePage(),
-    editPath: (_) => const ProfileEditPage(),
+    editPath: (_) => const UserProfileEditPage(),
   };
 
   @override

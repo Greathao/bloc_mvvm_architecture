@@ -102,6 +102,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.1.1"
+  flutter_floor_layout:
+    dependency: "direct main"
+    description:
+      name: flutter_floor_layout
+      sha256: "8d1d66da9906403348d42a080d38482441b7122bf772e6521f0bfcac915b4565"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1"
   flutter_lints:
     dependency: "direct dev"
     description:

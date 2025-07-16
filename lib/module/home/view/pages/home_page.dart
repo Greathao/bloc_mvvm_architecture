@@ -1,35 +1,56 @@
-import 'package:bloc_mvvm_architecture/core/router/app_router.dart';
-import 'package:bloc_mvvm_architecture/module/home/router/home_routers.dart';
+import 'package:bloc_mvvm_architecture/module/home/bloc/home_bloc.dart';
+import 'package:bloc_mvvm_architecture/module/home/bloc/home_event.dart';
+import 'package:bloc_mvvm_architecture/module/home/bloc/home_state.dart';
+import 'package:bloc_mvvm_architecture/module/home/product_repository/home_repository.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_floor_layout/flutter_floor_layout.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class ProductPage extends StatelessWidget {
+  const ProductPage({super.key});
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('首页')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            // 跳转到子模块：活动页
-            // AppRouter.push(context, HomeModuleRoute.activityPath);
-
-            // 方式 1：arguments 传参
-            AppRouter.push(
-              context,
-              HomeModuleRoute.activityPath,
-              arguments: {'actId': '1002'},
-            );
-
-            // 方式 2（可选）：通过 URI 跳转
-            // AppRouter.pushFromUri(context, Uri.parse('/home/activity?actId=1001'));
-
+    return BlocProvider(
+      create: (_) => ProductBloc(ProductRepository())..add(LoadInitialProducts()),
+      child: Scaffold(
+        appBar: AppBar(title: Text('BLoC 示例')),
+        body: BlocBuilder<ProductBloc, ProductState>(
+          builder: (context, state) {
+            if (state is ProductLoading || state is ProductInitial) {
+              return Center(child: CircularProgressIndicator());
+            } else if (state is ProductError) {
+              return Center(child: Text('出错了: ${state.message}'));
+            } else if (state is ProductLoaded) {
+              return NotificationListener<ScrollNotification>(
+                onNotification: (scroll) {
+                  final max = scroll.metrics.maxScrollExtent;
+                  final current = scroll.metrics.pixels;
+                  if (current > max - 100 && state.hasMore) {
+                    context.read<ProductBloc>().add(LoadMoreProducts());
+                  }
+                  return false;
+                },
+                child: ListView.builder(
+                  itemCount: state.products.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == state.products.length) {
+                      return state.hasMore ? Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Center(child: CircularProgressIndicator()),
+                      ) : SizedBox();
+                    }
+                    final item = state.products[index];
+                    return ListTile(
+                      leading: Image.network(item.imageUrl, width: 60, height: 60, fit: BoxFit.cover),
+                      title: Text(item.title),
+                    );
+                  },
+                ),
+              );
+            }
+            return SizedBox();
           },
-          child: const Text('进入活动页'),
         ),
       ),
     );
   }
 }
-
