@@ -1,5 +1,6 @@
 import 'package:bloc_mvvm_architecture/module/home/router/home_routers.dart';
 import 'package:bloc_mvvm_architecture/module/profile/router/profile_routers.dart';
+import 'package:bloc_mvvm_architecture/module/tabbar/router/tabbar_routers.dart';
 import 'package:flutter/material.dart';
 import 'base_module_route.dart';
 import 'not_found_page.dart';
@@ -22,6 +23,7 @@ class AppRouter {
   static final List<BaseModuleRoute> _modules = [
     HomeModuleRoute(),
     ProfileModuleRoute(),
+    TabbarModuleRoute(),
   ];
 
   /// 合并所有模块的路由表，形成全局路由表
@@ -90,7 +92,6 @@ class AppRouter {
   static void pushFromUri(BuildContext context, Uri uri) {
     final path = uri.path;
     final queryParams = uri.queryParameters;
-
     Navigator.pushNamed(
       context,
       path,
@@ -160,3 +161,4 @@ class _FakeBuildContext implements BuildContext {
   @override
   noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
+
