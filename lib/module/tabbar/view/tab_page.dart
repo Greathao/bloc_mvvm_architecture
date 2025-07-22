@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'package:app_links/app_links.dart';
 import 'package:bloc_mvvm_architecture/core/router/app_router.dart';
 import 'package:bloc_mvvm_architecture/module/home/router/home_routers.dart';
 import 'package:bloc_mvvm_architecture/module/profile/router/profile_routers.dart';
+import 'package:bloc_mvvm_architecture/module/web/router/web_routers.dart';
 import 'package:flutter/material.dart';
 
 class MainTabPage extends StatefulWidget {
@@ -12,25 +14,46 @@ class MainTabPage extends StatefulWidget {
 
 class _MainTabPageState extends State<MainTabPage> {
   int _currentIndex = 0;
-
   // Tab入口路由列表
-  final List<String> _tabEntryPaths = [HomeModuleRoute().entryPath, ProfileModuleRoute().entryPath];
-
+  final List<String> _tabEntryPaths = [
+    HomeModuleRoute().entryPath,
+    ProfileModuleRoute().entryPath,
+  ];
   late final List<Widget> _pages;
+  //监听
+  StreamSubscription<Uri>? _linkSubscription;
 
   @override
   void initState() {
     super.initState();
-    _pages = _tabEntryPaths.map((path) => AppRouter.getPageWidget(path)).toList();
+    _pages =
+        _tabEntryPaths.map((path) => AppRouter.getPageWidget(path)).toList();
+    initDeepLinks();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _linkSubscription?.cancel();
+    super.dispose();
+  }
+
+  Future<void> initDeepLinks() async {
+    // Handle links
+    _linkSubscription = AppLinks().uriLinkStream.listen((uri) {
+      debugPrint('onAppLink: $uri');
+      openAppLink(uri);
+    });
+  }
+
+  void openAppLink(Uri uri) {
+    AppRouter.pushFromUrl(context, uri.toString());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),

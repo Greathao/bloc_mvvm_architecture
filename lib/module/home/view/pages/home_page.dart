@@ -4,7 +4,6 @@ import 'package:bloc_mvvm_architecture/module/home/bloc/home_event.dart';
 import 'package:bloc_mvvm_architecture/module/home/bloc/home_state.dart';
 import 'package:bloc_mvvm_architecture/module/home/product_repository/home_repository.dart';
 import 'package:bloc_mvvm_architecture/module/home/router/home_routers.dart';
-import 'package:bloc_mvvm_architecture/module/tabbar/router/tabbar_routers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -45,7 +44,8 @@ class ProductPage extends StatelessWidget {
                     return ListTile(
                       leading: Image.network(item.imageUrl, width: 60, height: 60, fit: BoxFit.cover),
                       title: Text(item.title),
-                      onTap: () => AppRouter.push(context, HomeModuleRoute.activityPath, arguments: {'actId': 1000}),
+                      // onTap: () => AppRouter.push(context, HomeModuleRoute.activityPath, arguments: {'actId': 1000}),
+                      onTap: () => AppRouter.pushFromUrl(context, 'myapp://home/activity?actId=10000000'),
 
                     );
                   },

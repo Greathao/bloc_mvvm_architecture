@@ -1,6 +1,6 @@
 import 'package:bloc_mvvm_architecture/module/home/router/home_routers.dart';
 import 'package:bloc_mvvm_architecture/module/profile/router/profile_routers.dart';
-import 'package:bloc_mvvm_architecture/module/tabbar/router/tabbar_routers.dart';
+import 'package:bloc_mvvm_architecture/module/web/router/web_routers.dart';
 import 'package:flutter/material.dart';
 import 'base_module_route.dart';
 import 'not_found_page.dart';
@@ -23,7 +23,7 @@ class AppRouter {
   static final List<BaseModuleRoute> _modules = [
     HomeModuleRoute(),
     ProfileModuleRoute(),
-    TabbarModuleRoute(),
+    WebModuleRoute()
   ];
 
   /// 合并所有模块的路由表，形成全局路由表
@@ -88,31 +88,50 @@ class AppRouter {
     Navigator.pushNamed(context, routeName, arguments: arguments);
   }
 
-  /// 通过 Uri 跳转，自动拆解 path 与 query 参数
-  static void pushFromUri(BuildContext context, Uri uri) {
-    final path = uri.path;
-    final queryParams = uri.queryParameters;
-    Navigator.pushNamed(
-      context,
-      path,
-      arguments: queryParams.isNotEmpty ? queryParams : null,
-    );
-  }
-
   /// 替换当前页面，支持传递参数
   static void replace(BuildContext context, String routeName, {Object? arguments}) {
     Navigator.pushReplacementNamed(context, routeName, arguments: arguments);
   }
 
-  /// 通过 Uri 替换当前页面，拆解路径和参数
-  static void replaceFromUri(BuildContext context, Uri uri) {
-    final path = uri.path;
-    final queryParams = uri.queryParameters;
-    Navigator.pushReplacementNamed(
-      context,
-      path,
-      arguments: queryParams.isNotEmpty ? queryParams : null,
-    );
+  /// 通过字符串 URL 跳转（适配接口下发的 myapp://xxx?id=xxx）
+  static void pushFromUrl(BuildContext context, String url) {
+    try {
+      final uri = Uri.parse(url);
+      final path = "/${uri.host}${uri.path}";
+      final queryParams = uri.queryParameters;
+      debugPrint('onAppLink——path: $path');
+      debugPrint('onAppLink——queryParams: $queryParams');
+
+      Navigator.pushNamed(
+        context,
+        path,
+        arguments: queryParams.isNotEmpty ? queryParams : null,
+      );
+
+    } catch (e, stack) {
+      debugPrint('onAppLink——queryParams$e');
+    }
+  }
+
+  /// 替换当前页面通过字符串 URL（可用于冷启动后的重定向）
+  static void replaceFromUrl(BuildContext context, String url) {
+    try {
+      final uri = Uri.parse(url);
+      final path = uri.path;
+      final queryParams = uri.queryParameters;
+      Navigator.pushReplacementNamed(
+        context,
+        path,
+        arguments: queryParams.isNotEmpty ? queryParams : null,
+      );
+    } catch (e, stack) {
+      debugPrint("❌ replaceFromUrl Error: $e");
+      debugPrintStack(stackTrace: stack);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => NotFoundPage(routeName: url)),
+      );
+    }
   }
 
   /// 打印当前注册的所有路由，方便调试
